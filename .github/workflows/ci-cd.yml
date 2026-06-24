@@ -45,7 +45,7 @@ jobs:
           path: build/HTML5
 
       - name: Upload para itch.io
-        uses: josephbmanley/butler-publish-itchio-action@v1.0.3
+        uses: josephbmanley/butler-publish-itchio-action@v1.2.0
         env:
           BUTLER_CREDENTIALS: ${{ secrets.BUTLER_CREDENTIALS }}
           CHANNEL: html5
