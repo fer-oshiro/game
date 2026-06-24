@@ -1,4 +1,4 @@
-name: CI-CD
+name: CI
 
 on:
   push:
@@ -18,10 +18,10 @@ jobs:
         uses: actions/checkout@v4.2.2
 
       - name: Exportar jogo (HTML5)
-        uses: firebelley/godot-export@v5.2.1
+        uses: firebelley/godot-export@v8.0.0
         with:
-          godot_executable_download_url: "https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip"
-          godot_export_templates_download_url: "https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_export_templates.tpz"
+          godot_executable_download_url: "https://github.com/godotengine/godot/releases/download/4.6-stable/Godot_v4.6-stable_linux.x86_64.zip"
+          godot_export_templates_download_url: "https://github.com/godotengine/godot/releases/download/4.6-stable/Godot_v4.6-stable_export_templates.tpz"
           relative_project_path: ./
 
       - name: Salvar build como artifact
@@ -42,7 +42,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: html5-build
-          path: build/HTML5
+          path: build/html5/
 
       - name: Upload para itch.io
         uses: josephbmanley/butler-publish-itchio-action@v1.2.0
@@ -51,4 +51,4 @@ jobs:
           CHANNEL: html5
           ITCH_GAME: game
           ITCH_USER: fer-oshiro
-          PACKAGE: build/HTML5
+          PACKAGE: build/html5/
