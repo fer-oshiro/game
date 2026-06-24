@@ -1,0 +1,54 @@
+name: CI-CD
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build:
+    environment: prod
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Exportar jogo (HTML5)
+        uses: firebelley/godot-export@v5.2.1
+        with:
+          godot_executable_download_url: "https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip"
+          godot_export_templates_download_url: "https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_export_templates.tpz"
+          relative_project_path: ./
+
+      - name: Salvar build como artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: html5-build
+          path: build/HTML5
+
+  deploy:
+    environment: prod
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Baixar artifact da build
+        uses: actions/download-artifact@v4
+        with:
+          name: html5-build
+          path: build/HTML5
+
+      - name: Upload para itch.io
+        uses: josephbmanley/butler-publish-itchio-action@v1.0.3
+        env:
+          BUTLER_CREDENTIALS: ${{ secrets.BUTLER_CREDENTIALS }}
+          CHANNEL: html5
+          ITCH_GAME: game
+          ITCH_USER: fer-oshiro
+          PACKAGE: build/HTML5
