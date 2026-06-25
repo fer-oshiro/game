@@ -61,20 +61,15 @@ func setup_speech_recognition():
         };
     """
 	JavaScriptBridge.eval(js_code)
-func permission():
-	if OS.has_feature("web"):
-		JavaScriptBridge.eval("window.requestMicPermission();")
-		print("Ouvindo...")
-
 func start_listening():
 	if OS.has_feature("web"):
-		JavaScriptBridge.eval("window.startSpeechRecognition();")
-		print("Ouvindo...")
+		JavaScriptBridge.eval("window.startRecording();")
+		print("Gravando...")
 
 func stop_listening():
 	if OS.has_feature("web"):
-		JavaScriptBridge.eval("window.stopSpeechRecognition();")
-		print("Parou de ouvir.")
+		JavaScriptBridge.eval("window.stopRecording();")
+		print("Parou de gravar.")
 
 # Esta função é chamada quando o navegador entende a voz
 func _on_speech_received(args):
