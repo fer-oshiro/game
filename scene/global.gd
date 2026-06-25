@@ -2,18 +2,18 @@ extends Node
 
 var score:int = 999
 
-var recognition # O objeto de reconhecimento de voz no JS
+var recognition 
 var text_received
+var _js_callback
 signal texto_reconhecido(texto)
 
 func _ready():
-	# Verifica se estamos rodando no navegador
 	if OS.has_feature("web"):
 		setup_speech_recognition()
 
 func setup_speech_recognition():
-	var callback = JavaScriptBridge.create_callback(_on_speech_received)
-	JavaScriptBridge.get_interface("window").godot_speech_callback = callback
+	_js_callback = JavaScriptBridge.create_callback(_on_speech_received)
+	JavaScriptBridge.get_interface("window").godot_speech_callback = _js_callback
 	var js_code = """
 	    window.startRecording = async function() {
 	        try {
@@ -83,7 +83,7 @@ func stop_listening():
 		print("Parou de gravar.")
 
 func _on_speech_received(args):
-	text_received = args
+	text_received = args[0]
 	texto_reconhecido.emit(text_received)
 	
 	
