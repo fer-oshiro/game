@@ -15,52 +15,51 @@ func setup_speech_recognition():
 	var callback = JavaScriptBridge.create_callback(_on_speech_received)
 	JavaScriptBridge.get_interface("window").godot_speech_callback = callback
 	var js_code = """
-		window.startSpeechRecognition = async function() {
-			try {
-				const SpeechRecognitionClass = window.SpeechRecognition || window.webkitSpeechRecognition;
+        window.startRecording = async function() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const chunks = [];
 
-				if (!SpeechRecognitionClass) {
-					console.error("Web Speech API não suportada neste navegador.");
-					return;
-				}
+                window.mediaRecorder = new MediaRecorder(stream);
 
-				const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-				stream.getTracks().forEach(track => track.stop());
+                window.mediaRecorder.ondataavailable = function(event) {
+                    chunks.push(event.data);
+                };
 
-				window.recognition = new SpeechRecognitionClass();
-				window.recognition.lang = 'pt-BR';
-				window.recognition.interimResults = false;
-				window.recognition.continuous = false;
+                window.mediaRecorder.onstop = async function() {
+				    const blob = new Blob(chunks, { type: 'audio/webm' });
+				    const arrayBuffer = await blob.arrayBuffer();
+				    const bytes = new Uint8Array(arrayBuffer);
 
-				window.recognition.onresult = function(event) {
-					const text = event.results[0][0].transcript;
-					console.log("Texto reconhecido:", text);
-					window.godot_speech_callback(text);
+				    let binary = '';
+				    bytes.forEach(b => binary += String.fromCharCode(b));
+				    const base64 = btoa(binary);
+
+				    const response = await fetch('https://a3az34kyk44xowasglwg6epsmy0kfmeh.lambda-url.us-east-1.on.aws/', {
+				        method: 'POST',
+				        headers: { 'Content-Type': 'application/json' },
+				        body: JSON.stringify({ audio: base64 })
+				    });
+
+				    const data = await response.json();
+				    window.godot_speech_callback(data.text);
 				};
 
-				window.recognition.onerror = function(event) {
-					console.error("Erro no recognition:", event.error);
-				};
+                window.mediaRecorder.start();
+                console.log("Gravando...");
 
-				window.recognition.onend = function() {
-					console.log("Reconhecimento encerrado.");
-				};
+            } catch (error) {
+                console.error("Erro ao gravar:", error);
+            }
+        };
 
-				console.log("Microfone liberado, iniciando reconhecimento...");
-				window.recognition.start();
-
-			} catch (error) {
-				console.error("Erro no microfone:", error);
-			}
-		};
-
-		window.stopSpeechRecognition = function() {
-			if (window.recognition) {
-				window.recognition.stop();
-				console.log("Parado manualmente.");
-			}
-		};
-	"""
+        window.stopRecording = function() {
+            if (window.mediaRecorder && window.mediaRecorder.state !== 'inactive') {
+                window.mediaRecorder.stop();
+                console.log("Gravação encerrada.");
+            }
+        };
+    """
 	JavaScriptBridge.eval(js_code)
 func permission():
 	if OS.has_feature("web"):
