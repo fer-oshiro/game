@@ -14,14 +14,24 @@ func _ready():
 func setup_speech_recognition():
 	# Código JavaScript em formato de String
 	var js_code = """
-        window.recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        window.recognition.lang = 'pt-BR';
-        window.recognition.interimResults = false;
-
-        window.recognition.onresult = function(event) {
-            var text = event.results[0][0].transcript;
-            // Envia o texto de volta para o Godot
-            window.godot_speech_callback(text);
+		window.requestMicPermission = async function() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                stream.getTracks().forEach(track => track.stop());
+              
+                window.recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                window.recognition.lang = 'pt-BR';
+                window.recognition.interimResults = false;
+                window.recognition.onresult = function(event) {
+                    window.godot_speech_callback(event.results[0][0].transcript);
+                };
+              
+                console.log("Microfone liberado!");
+                return true;
+            } catch (error) {
+                console.error("Erro no microfone:", error.name);
+                return false;
+            }
         };
     """
 	JavaScriptBridge.eval(js_code)
@@ -30,11 +40,15 @@ func setup_speech_recognition():
 	var callback = JavaScriptBridge.create_callback(_on_speech_received)
 	JavaScriptBridge.get_interface("window").godot_speech_callback = callback
 
+func permission():
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("window.requestMicPermission();")
+		print("Ouvindo...")
+
 func start_listening():
 	if OS.has_feature("web"):
 		JavaScriptBridge.eval("window.recognition.start();")
 		print("Ouvindo...")
-		
 
 func stop_listening():
 	if OS.has_feature("web"):
