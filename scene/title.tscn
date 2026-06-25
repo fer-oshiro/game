@@ -68,3 +68,32 @@ grow_vertical = 2
 theme_override_fonts/font = ExtResource("6_1oobv")
 theme_override_font_sizes/font_size = 50
 text = "Score: 123"
+
+[node name="MenuButton2" type="MenuButton" parent="." unique_id=1119206187]
+layout_mode = 0
+offset_left = 424.0
+offset_top = 272.0
+offset_right = 749.0
+offset_bottom = 363.0
+theme_override_font_sizes/font_size = 60
+text = "parar"
+
+[node name="MenuButton" type="MenuButton" parent="." unique_id=388577563]
+layout_mode = 0
+offset_left = 421.0
+offset_top = 160.0
+offset_right = 746.0
+offset_bottom = 251.0
+theme_override_font_sizes/font_size = 60
+text = "comecar"
+
+[node name="Label2" type="Label" parent="." unique_id=1005674723]
+layout_mode = 0
+offset_left = 441.0
+offset_top = 370.0
+offset_right = 720.0
+offset_bottom = 451.0
+text = "teste"
+
+[connection signal="pressed" from="MenuButton2" to="." method="_on_menu_button_2_pressed"]
+[connection signal="pressed" from="MenuButton" to="." method="_on_menu_button_pressed"]
