@@ -24,7 +24,3 @@ func _on_menu_button_2_pressed() -> void:
 
 func atualizar_texto(text):
 	$Label2.text = text
-
-func _on_menu_button_3_pressed() -> void:
-	Global.permission()
-	pass # Replace with function body.

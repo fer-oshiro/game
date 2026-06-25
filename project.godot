@@ -23,6 +23,11 @@ config/icon="res://icon.svg"
 
 Global="*uid://baaqqj13k7wsd"
 
+[display]
+
+window/size/viewport_width=960
+window/size/viewport_height=540
+
 [input]
 
 left={
