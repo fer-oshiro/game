@@ -23,17 +23,13 @@ func setup_speech_recognition():
 	            window.mediaRecorder = new MediaRecorder(stream);
 
 	            window.mediaRecorder.ondataavailable = function(event) {
-	                console.log("Chunk recebido, tamanho:", event.data.size);
 	                if (event.data.size > 0) {
 	                    chunks.push(event.data);
 	                }
 	            };
 
 	            window.mediaRecorder.onstop = async function() {
-	                console.log("onstop chamado, chunks:", chunks.length);
-	                
 	                const blob = new Blob(chunks, { type: 'audio/webm' });
-	                console.log("Blob size:", blob.size);
 	                
 	                const arrayBuffer = await blob.arrayBuffer();
 	                const bytes = new Uint8Array(arrayBuffer);
@@ -86,11 +82,8 @@ func stop_listening():
 		JavaScriptBridge.eval("window.stopRecording();")
 		print("Parou de gravar.")
 
-# Esta função é chamada quando o navegador entende a voz
 func _on_speech_received(args):
-	
-	text_received = args[0]
-	print("O navegador ouviu: ", text_received)
+	text_received = args
 	texto_reconhecido.emit(text_received)
 	
 	

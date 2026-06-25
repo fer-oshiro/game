@@ -23,4 +23,5 @@ func _on_menu_button_2_pressed() -> void:
 	pass # Replace with function body.
 
 func atualizar_texto(text):
+	$Label3.text = "foi chamado -.-"
 	$Label2.text = text
